@@ -1,0 +1,14 @@
+listen: ":8000"
+log-debug: false
+html-path: /html
+db:
+  path: "/data/tcwh.db"
+auth:
+  secret: "replace this with random nonsense"
+  issuer: "https://yourwebsitehere/"
+  audience: "https://yourwebsitehere/"
+twitch:
+  client-id: "twitch-client-id"
+  client-secret: "twitch-client-secret"
+  redirect-uri: "https://yourwebsitehere/oauth/cb"
+  webhook-cb-url: "https://yourwebsitehere/webhook/cb/"

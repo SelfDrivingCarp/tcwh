@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>AutonomousKoi Twitch Chat Bridge</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+
+        .fields-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .fields-2col>label {
+            font-weight: bolder;
+        }
+
+        .grid-3col {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        #twitch>#details {
+            width: 400px;
+            padding: 1em;
+        }
+
+        #webhooks>#details {
+            width: 400px;
+            padding: 1em;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>AutonomousKoi Twitch Chat Bridge</h1>
+    <h2 id="user"></h2>
+
+    <section id="twitch">
+        <h3>Twitch</h3>
+        <div id="new" class="hidden"><a href="/oauth/new">Connect Twitch</a></div>
+        <div id="details" class="hidden">
+            <div id="fields" class="fields-2col">
+                <label>Twitch ID</label>
+                <div id="twitch_id"></div>
+
+                <label>Twitch Login</label>
+                <div id="twitch_login"></div>
+
+                <label>Last Validated</label>
+                <div id="last_validated"></div>
+            </div>
+            <button id="delete">Delete</button>
+        </div>
+    </section>
+
+    <section id="webhooks">
+        <h3>Webhooks</h3>
+        <div id="details" class="grid-3col"></div>
+        <button id="new">New</button>
+    </section>
+
+    <dialog id="add_webhook">
+        <h2>Add Webhook</h2>
+        <form class="fields-2col" method="POST" action="/webhooks">
+            <label for="label">Label</label>
+            <input type="text" id="label" name="label" />
+
+            <label for="url">Webhook URL</label>
+            <input type="text" id="url" name="url" />
+
+            <label for="template_type">Type</label>
+            <select id="template_type" name="template_type">
+                <option>discord</option>
+            </select>
+
+            <button id="cancel" type="button">Cancel</button>
+            <button id="save" type="submit">Save</button>
+        </form>
+    </dialog>
+
+    <dialog id="edit_webhook">
+        <h2>Edit Webhook</h2>
+        <h3 id="label"></h3>
+        <button id="enable"></button>
+        <button id="delete">Delete</button>
+        <button id="cancel">Cancel</button>
+    </dialog>
+</body>
+
+<script src="main.js">
+    updateUser();
+</script>
+
+</html>
