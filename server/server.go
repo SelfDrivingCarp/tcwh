@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"cmp"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -29,7 +30,7 @@ type Server struct {
 }
 
 func New(cfg *tcwh.Config, log *slog.Logger, ctrl *controller.Controller) (*Server, error) {
-	twitchAuthURL, err := url.Parse(tcwh.Default(cfg.Twitch.TwitchAuthURL, defaultTwitchAuthURL))
+	twitchAuthURL, err := url.Parse(cmp.Or(cfg.Twitch.TwitchAuthURL, defaultTwitchAuthURL))
 	if err != nil {
 		return nil, fmt.Errorf("parsing cfg oauth.twitch-auth-url: %w", err)
 	}

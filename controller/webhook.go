@@ -8,12 +8,14 @@ import (
 )
 
 type webhook struct {
-	Sub          string  `db:"sub"`
-	Label        string  `db:"label"`
-	TemplateType string  `db:"template_type"`
-	Template     *string `db:"template"`
-	URL          string  `db:"url"`
-	Enabled      bool    `db:"enabled"`
+	Sub              string  `db:"sub"`
+	Label            string  `db:"label"`
+	TemplateType     string  `db:"template_type"`
+	Template         *string `db:"template"`
+	URL              string  `db:"url"`
+	Enabled          bool    `db:"enabled"`
+	EmotePlaceholder rune    `db:"emote_placeholder"`
+	NamePrefixes     *string `db:"name_prefixes"`
 }
 
 func (dbwh webhook) Promote() *tcwh.Webhook {

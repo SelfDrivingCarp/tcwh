@@ -18,6 +18,8 @@ import (
 //go:embed schema1.sql
 var schema1 string
 
+var schemas = []string{schema1}
+
 type Controller struct {
 	cfg       *tcwh.Config
 	log       *slog.Logger
@@ -50,10 +52,14 @@ func (ctrl *Controller) init() error {
 		return fmt.Errorf("getting database version: %w", err)
 	}
 	ctrl.log.Debug("got PRAGMA", "user_version", version)
-	if version != 1 {
-		ctrl.log.Info("initializing database")
-		if _, err := ctrl.db.Exec(schema1); err != nil {
-			return fmt.Errorf("initializing database: %w", err)
+
+	for i, schema := range schemas {
+		if i+1 <= version {
+			continue
+		}
+		ctrl.log.Info("applying schema", "version", i+1)
+		if _, err := ctrl.db.Exec(schema); err != nil {
+			return fmt.Errorf("applying schema %d: %w", i+1, err)
 		}
 	}
 	if err := ctrl.getAppToken(); err != nil {

@@ -1,11 +1,7 @@
 package controller
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
-	"time"
 
 	"github.com/selfdrivingcarp/tcwh"
 )
@@ -68,34 +64,29 @@ func (ctrl *Controller) eventWebhookCall(sub string, we webhookEvent) {
 		"broadcaster_user_name", we.Event.BroadcasterUserName,
 	)
 
-	f := fmt.Sprintf("[%s|%s] %s: %s", we.Event.BroadcasterUserName, time.Now().Format(time.TimeOnly), we.Event.ChatterUserName, we.Event.Message.Text)
-	b, err := json.Marshal(struct {
-		Content string `json:"content"`
-	}{Content: f})
-	if err != nil {
-		ctrl.log.Error("marshaling webhook body", "error", err.Error())
-		return
-	}
-	wh, err := getWebhooks(context.Background(), ctrl.db, sub)
+	whs, err := getWebhooks(context.Background(), ctrl.db, sub)
 	if err != nil {
 		ctrl.log.Error("getting webhooks", "sub", sub, "error", err.Error())
 		return
 	}
-	for _, wh := range wh {
+	for _, wh := range whs {
 		if !wh.Enabled {
 			continue
 		}
-		ctrl.lock.Lock()
-		sender, present := ctrl.senders[wh.URL]
-		if !present {
-			sender = newSender(ctrl.log, wh.URL)
-			ctrl.sendersWG.Go(sender.Run)
-			ctrl.senders[wh.URL] = sender
-		}
-		sender.Send(&webhookSend{
-			body: bytes.NewReader(b),
-			wh:   wh,
-		})
-		ctrl.lock.Unlock()
+		func() {
+			ctrl.lock.Lock()
+			defer ctrl.lock.Unlock()
+			sender, present := ctrl.senders[wh.URL]
+			if !present {
+				sender, err = newSender(ctrl.log, wh)
+				if err != nil {
+					ctrl.log.Error("creating sender", "url", wh.URL, "error", err.Error())
+					return
+				}
+				ctrl.sendersWG.Go(sender.Run)
+				ctrl.senders[wh.URL] = sender
+			}
+			sender.Send(we.Event)
+		}()
 	}
 }

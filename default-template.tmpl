@@ -1,0 +1,18 @@
+{{- $emoteReplace := "🐬" -}}
+{{-	$namePrefixes := "🌍🌈🌕🌪🌲🌶🌽🍆🍑🎓" -}}
+{{- "`" -}}                                                  {{- /* Start with a backtick to specify a monospace font */ -}}
+[                                                            {{- /* An opening square bracket to group stream name and time */}}
+{{- .Event.BroadcasterUserName -}}                           {{- /* The stream name */ -}}
+|                                                            {{- /* A pipe to separate the streame name from the time */}}
+{{- .When.Format "15:04:05" -}}                              {{- /* The time, just hours, minutes, seconds*/ -}}
+]{{ "` **" -}}                                               {{- /* Closing square bracket, backtick to end monospace, a space, ** to begin bold */}}
+{{- selectChatterRune $namePrefixes .Event.ChatterUserID -}} {{- /* Optional chatter unicode rune */}}
+{{- .Event.ChatterUserName }}**:{{ " " -}}                   {{- /* Chatter username, ** to end bold, literal : and a space */}}
+
+{{- range .Event.Message.Fragments -}}  {{- /* For each message fragment */}}
+	{{- if eq .Type "text" -}}          {{- /* If it's a text fragment */}}
+		{{- .Text -}}                   {{- /* Just output that text */}}
+	{{- else -}}                        {{- /* Otherwise, assume it's an emote fragment */}}
+		{{- or $emoteReplace .Text -}}  {{- /* If there's an emote replacement, use that or the emote text */}}
+	{{- end -}}
+{{- end -}}

@@ -1,7 +1,13 @@
 package tcwh
 
 import (
+	"bytes"
+	"context"
+	_ "embed"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"net/http"
 	"time"
 )
 
@@ -11,13 +17,11 @@ var (
 	ErrNotFound  = errors.New("not found")
 )
 
-func Default[T comparable](v, defaultV T) T {
-	var zero T
-	if v == zero {
-		return defaultV
-	}
-	return v
-}
+//go:embed default-template.tmpl
+var DefaultTemplate string
+
+//go:embed test-event.json
+var TestEvent []byte
 
 type UserState struct {
 	User     string     `json:"user"`
@@ -43,6 +47,29 @@ type Webhook struct {
 	Template     string `json:"template,omitempty"`
 	URL          string `json:"url"`
 	Enabled      bool   `json:"enabled"`
+}
+
+func (wh *Webhook) Send(ctx context.Context, msg string) error {
+	b, err := json.Marshal(struct {
+		Content string `json:"content"`
+	}{Content: msg})
+	if err != nil {
+		return fmt.Errorf("marshaling webhook body: %w", err)
+	}
+	r, err := http.NewRequestWithContext(ctx, http.MethodPost, wh.URL, bytes.NewReader(b))
+	if err != nil {
+		return fmt.Errorf("creating request: %w", err)
+	}
+	r.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(r)
+	if err != nil {
+		return fmt.Errorf("sending request: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return fmt.Errorf("non-200 status: %s", resp.Status)
+	}
+	return nil
 }
 
 type WebhookCall struct {

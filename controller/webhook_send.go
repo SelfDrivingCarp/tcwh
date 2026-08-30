@@ -1,35 +1,73 @@
 package controller
 
 import (
+	"cmp"
 	"context"
-	"io"
+	"encoding/json"
+	"fmt"
 	"log/slog"
-	"net/http"
+	"strconv"
+	"strings"
+	"text/template"
 	"time"
+
+	"github.com/nicklaw5/helix/v2"
 
 	"github.com/selfdrivingcarp/tcwh"
 )
 
-type webhookSend struct {
-	body io.Reader
-	wh   *tcwh.Webhook
+var testEvent helix.EventSubChannelChatMessageEvent
+
+func init() {
+	if err := json.Unmarshal(tcwh.TestEvent, &testEvent); err != nil {
+		panic("unmarshaling test event: " + err.Error())
+	}
 }
 
 type webhookSender struct {
 	log      *slog.Logger
-	url      string
-	in       chan *webhookSend
+	wh       *tcwh.Webhook
+	in       chan *helix.EventSubChannelChatMessageEvent
+	tmpl     *template.Template
 	lastSend time.Time
 }
 
-func newSender(log *slog.Logger, url string) *webhookSender {
+func selectChatterRune(runes, chatterID string) string {
+	candidates := []rune(runes)
+	if len(runes) == 0 {
+		return ""
+	}
+	id, _ := strconv.Atoi(chatterID)
+	return string(candidates[id%len(candidates)])
+}
+
+func newSender(log *slog.Logger, wh *tcwh.Webhook) (*webhookSender, error) {
+	tmpl, err := template.New("").
+		Funcs(template.FuncMap{
+			"selectChatterRune": selectChatterRune,
+		}).
+		Parse(cmp.Or(wh.Template, tcwh.DefaultTemplate))
+	if err != nil {
+		return nil, fmt.Errorf("parsing template: %w", err)
+	}
+
 	sender := &webhookSender{
-		log:      log.With("sender_url", url),
-		in:       make(chan *webhookSend, 64),
-		url:      url,
+		log:      log.With("sender_url", wh.URL),
+		in:       make(chan *helix.EventSubChannelChatMessageEvent, 64),
+		wh:       wh,
+		tmpl:     tmpl,
 		lastSend: time.Now(),
 	}
-	return sender
+
+	msg, err := sender.format(&testEvent)
+	if err != nil {
+		return nil, fmt.Errorf("formatting test event: %w", err)
+	}
+	if msg == "" {
+		return nil, fmt.Errorf("no output from test event")
+	}
+
+	return sender, nil
 }
 
 func (sender *webhookSender) Run() {
@@ -39,12 +77,14 @@ func (sender *webhookSender) Run() {
 	}
 }
 
-func (sender *webhookSender) Send(whs *webhookSend) {
+func (sender *webhookSender) Send(event *helix.EventSubChannelChatMessageEvent) {
 	select {
-	case sender.in <- whs:
+	case sender.in <- event:
 		// cool
 	default:
-		sender.log.Warn("dropped event hook message")
+		sender.log.Warn("dropped event hook message",
+			"message_id", event.MessageID,
+		)
 	}
 }
 
@@ -53,25 +93,37 @@ func (sender *webhookSender) Close() {
 	close(sender.in)
 }
 
-func (sender *webhookSender) sendWebhookEvent(whs *webhookSend) {
+func (sender *webhookSender) format(event *helix.EventSubChannelChatMessageEvent) (string, error) {
+	var buf strings.Builder
+	data := struct {
+		When  time.Time
+		Event *helix.EventSubChannelChatMessageEvent
+	}{
+		When:  time.Now(),
+		Event: event,
+	}
+	if err := sender.tmpl.Execute(&buf, data); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
+}
+
+func (sender *webhookSender) sendWebhookEvent(event *helix.EventSubChannelChatMessageEvent) {
 	sender.lastSend = time.Now()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
-	r, err := http.NewRequestWithContext(ctx, http.MethodPost, whs.wh.URL, whs.body)
+	sender.log.Debug("sending webhook event",
+		"message_id", event.MessageID,
+		"broadcaster", event.BroadcasterUserName,
+		"chatter", event.ChatterUserName,
+	)
+	msg, err := sender.format(event)
 	if err != nil {
-		sender.log.Error("creating request", "sub", whs.wh.Sub, "error", err.Error())
+		sender.log.Error("formating event message", "message_id", event.MessageID, "error", err.Error())
 		return
 	}
-	r.Header.Set("Content-Type", "application/json")
-	resp, err := http.DefaultClient.Do(r)
-	if err != nil {
-		sender.log.Error("sending request")
-		return
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		sender.log.Error("non-200 status")
-		return
+	if err := sender.wh.Send(ctx, msg); err != nil {
+		sender.log.Error("sending webhook event", "message_id", event.MessageID, "error", err.Error())
 	}
 }
 

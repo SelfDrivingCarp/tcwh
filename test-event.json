@@ -1,0 +1,216 @@
+{
+    "broadcaster_user_id": "143175705",
+    "broadcaster_user_login": "selfdrivingcarp",
+    "broadcaster_user_name": "selfdrivingcarp",
+    "chatter_user_id": "143175705",
+    "chatter_user_login": "selfdrivingcarp",
+    "chatter_user_name": "selfdrivingcarp",
+    "message_id": "f4baf90e-d118-487f-8506-13ff64bff979",
+    "message": {
+        "text": "Beep BOop selfdrHoly LUL selfdrPhilo blarg selfdrLogo",
+        "fragments": [
+            {
+                "type": "text",
+                "text": "Beep BOop ",
+                "cheermote": {
+                    "prefix": "",
+                    "bits": 0,
+                    "tier": 0
+                },
+                "emote": {
+                    "id": "",
+                    "emote_set_id": "",
+                    "owner_id": "",
+                    "format": null
+                },
+                "mention": {
+                    "user_id": "",
+                    "user_name": "",
+                    "user_login": ""
+                }
+            },
+            {
+                "type": "emote",
+                "text": "selfdrHoly",
+                "cheermote": {
+                    "prefix": "",
+                    "bits": 0,
+                    "tier": 0
+                },
+                "emote": {
+                    "id": "emotesv2_35e5db78af614f22bee9107973fac6ea",
+                    "emote_set_id": "d99390fb-4f68-4edb-b1a0-f236bb504657",
+                    "owner_id": "143175705",
+                    "format": [
+                        "static"
+                    ]
+                },
+                "mention": {
+                    "user_id": "",
+                    "user_name": "",
+                    "user_login": ""
+                }
+            },
+            {
+                "type": "text",
+                "text": " ",
+                "cheermote": {
+                    "prefix": "",
+                    "bits": 0,
+                    "tier": 0
+                },
+                "emote": {
+                    "id": "",
+                    "emote_set_id": "",
+                    "owner_id": "",
+                    "format": null
+                },
+                "mention": {
+                    "user_id": "",
+                    "user_name": "",
+                    "user_login": ""
+                }
+            },
+            {
+                "type": "emote",
+                "text": "LUL",
+                "cheermote": {
+                    "prefix": "",
+                    "bits": 0,
+                    "tier": 0
+                },
+                "emote": {
+                    "id": "425618",
+                    "emote_set_id": "0",
+                    "owner_id": "0",
+                    "format": [
+                        "static"
+                    ]
+                },
+                "mention": {
+                    "user_id": "",
+                    "user_name": "",
+                    "user_login": ""
+                }
+            },
+            {
+                "type": "text",
+                "text": " ",
+                "cheermote": {
+                    "prefix": "",
+                    "bits": 0,
+                    "tier": 0
+                },
+                "emote": {
+                    "id": "",
+                    "emote_set_id": "",
+                    "owner_id": "",
+                    "format": null
+                },
+                "mention": {
+                    "user_id": "",
+                    "user_name": "",
+                    "user_login": ""
+                }
+            },
+            {
+                "type": "emote",
+                "text": "selfdrPhilo",
+                "cheermote": {
+                    "prefix": "",
+                    "bits": 0,
+                    "tier": 0
+                },
+                "emote": {
+                    "id": "emotesv2_8eb7937f2aa644a3a96d1ed61bb34456",
+                    "emote_set_id": "d99390fb-4f68-4edb-b1a0-f236bb504657",
+                    "owner_id": "143175705",
+                    "format": [
+                        "static"
+                    ]
+                },
+                "mention": {
+                    "user_id": "",
+                    "user_name": "",
+                    "user_login": ""
+                }
+            },
+            {
+                "type": "text",
+                "text": " blarg ",
+                "cheermote": {
+                    "prefix": "",
+                    "bits": 0,
+                    "tier": 0
+                },
+                "emote": {
+                    "id": "",
+                    "emote_set_id": "",
+                    "owner_id": "",
+                    "format": null
+                },
+                "mention": {
+                    "user_id": "",
+                    "user_name": "",
+                    "user_login": ""
+                }
+            },
+            {
+                "type": "emote",
+                "text": "selfdrLogo",
+                "cheermote": {
+                    "prefix": "",
+                    "bits": 0,
+                    "tier": 0
+                },
+                "emote": {
+                    "id": "emotesv2_c8ba7813fcc241f7b10fc9a10e7e7d74",
+                    "emote_set_id": "d99390fb-4f68-4edb-b1a0-f236bb504657",
+                    "owner_id": "143175705",
+                    "format": [
+                        "static"
+                    ]
+                },
+                "mention": {
+                    "user_id": "",
+                    "user_name": "",
+                    "user_login": ""
+                }
+            }
+        ]
+    },
+    "message_type": "text",
+    "badges": [
+        {
+            "set_id": "broadcaster",
+            "id": "1",
+            "info": ""
+        },
+        {
+            "set_id": "subscriber",
+            "id": "0",
+            "info": "26"
+        },
+        {
+            "set_id": "twitch-dj",
+            "id": "1",
+            "info": ""
+        }
+    ],
+    "cheer": {
+        "bits": 0
+    },
+    "color": "#FF4500",
+    "reply": {
+        "parent_message_id": "",
+        "parent_message_body": "",
+        "parent_user_id": "",
+        "parent_user_name": "",
+        "parent_user_login": "",
+        "thread_message_id": "",
+        "thread_user_id": "",
+        "thread_user_name": "",
+        "thread_user_login": ""
+    },
+    "channel_points_custom_reward_id": ""
+}
